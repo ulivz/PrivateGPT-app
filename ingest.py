@@ -2,6 +2,7 @@ import os
 import glob
 from typing import List
 from dotenv import load_dotenv
+import argparse
 
 from langchain.document_loaders import (
     CSVLoader,
@@ -68,7 +69,7 @@ def load_documents(source_dir: str) -> List[Document]:
     return [load_single_document(file_path) for file_path in all_files]
 
 
-def main():
+def main(collection):
     # Load environment variables
     persist_directory = os.environ.get('PERSIST_DIRECTORY')
     source_directory = os.environ.get('SOURCE_DIRECTORY', 'source_documents')
@@ -88,10 +89,17 @@ def main():
     embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
     
     # Create and store locally vectorstore
-    db = Chroma.from_documents(texts, embeddings, persist_directory=persist_directory, client_settings=CHROMA_SETTINGS)
+    db = Chroma.from_documents(texts, embeddings, collection_name=collection, persist_directory=persist_directory, client_settings=CHROMA_SETTINGS)
     db.persist()
     db = None
 
 
 if __name__ == "__main__":
-    main()
+    # Create the argument parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--collection", help="Saves the embedding in a collection name as specified")
+
+    # Parse the command-line arguments
+    args = parser.parse_args()
+
+    main(args.collection)
