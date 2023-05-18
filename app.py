@@ -6,8 +6,10 @@ from langchain.vectorstores import Chroma
 from langchain.llms import GPT4All, LlamaCpp
 import os
 from fastapi import FastAPI, UploadFile, File
-from typing import List
+from typing import List, Optional
 import urllib.parse
+import shutil
+
 app = FastAPI()
 
 
@@ -17,14 +19,13 @@ embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME")
 persist_directory = os.environ.get('PERSIST_DIRECTORY')
 
 model_type = os.environ.get('MODEL_TYPE')
-# model_path = os.environ.get('MODEL_PATH')
-model_path = ''
+model_path = os.environ.get('MODEL_PATH')
 model_n_ctx = os.environ.get('MODEL_N_CTX')
 source_directory = os.environ.get('SOURCE_DIRECTORY', 'source_documents')
 
 from constants import CHROMA_SETTINGS
 
-def test_embedding():
+async def test_embedding():
     # Create the folder if it doesn't exist
     os.makedirs(source_directory, exist_ok=True)
     # Create a sample.txt file in the source_documents directory
@@ -35,8 +36,9 @@ def test_embedding():
     os.system('python ingest.py --collection test')
     # Delete the sample.txt file
     os.remove(file_path)
+    print("embeddings working")
 
-def model_download():
+async def model_download():
     match model_type:
         case "LlamaCpp":
             url = "https://gpt4all.io/models/ggml-gpt4all-l13b-snoozy.bin"
@@ -55,13 +57,15 @@ def model_download():
     os.system(f"wget {url} -O {filename}")
     global model_path 
     model_path = filename
+    print("model downloaded")
     
 
 # Starting the app with embedding and llm download
 @app.on_event("startup")
 async def startup_event():
-    test_embedding()
-    model_download()
+    await test_embedding()
+    await model_download()
+
 
 # Example route
 @app.get("/")
@@ -69,9 +73,11 @@ async def root():
     return {"message": "Hello, the APIs are now ready for your embeds and queries!"}
 
 @app.post("/embed")
-async def embed(files: List[UploadFile], collection_name: str):
+async def embed(files: List[UploadFile], collection_name: Optional[str] = None):
+    if collection_name is None:
+        # Handle the case when the collection_name is not defined
+        collection_name = "default_collection"
     saved_files = []
-    
     # Save the files to the specified folder
     for file in files:
         file_path = os.path.join(source_directory, file.filename)
@@ -82,13 +88,17 @@ async def embed(files: List[UploadFile], collection_name: str):
     
     os.system(f'python ingest.py --collection {collection_name}')
     
+    # Delete the contents of the folder
+    # [os.remove(os.path.join(source_directory, item)) if os.path.isfile(os.path.join(source_directory, item)) else shutil.rmtree(os.path.join(source_directory, item)) for item in os.scandir(source_directory)]
+    [os.remove(os.path.join(source_directory, file.filename)) or os.path.join(source_directory, file.filename) for file in files]
+    
     return {"message": "Files embedded successfully", "saved_files": saved_files}
 
 @app.post("/retrieve")
-async def query(query: str):
+async def query(query: str, collection_name:str):
     
     embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
-    db = Chroma(persist_directory=persist_directory, embedding_function=embeddings, client_settings=CHROMA_SETTINGS)
+    db = Chroma(persist_directory=persist_directory,collection_name=collection_name, embedding_function=embeddings, client_settings=CHROMA_SETTINGS)
     retriever = db.as_retriever()
     # Prepare the LLM
     callbacks = [StreamingStdOutCallbackHandler()]
@@ -106,10 +116,6 @@ async def query(query: str):
     res = qa(query)
     print(res)   
     answer, docs = res['result'], res['source_documents']
-    
-    # # Print the relevant sources used for the answer
-    # for document in docs:
-    #     print("\n> " + document.metadata["source"] + ":")
-    #     print(document.page_content)
+
 
     return {"results": answer, "docs":docs}
