@@ -74,7 +74,7 @@ def main(collection):
     persist_directory = os.environ.get('PERSIST_DIRECTORY')
     source_directory = os.environ.get('SOURCE_DIRECTORY', 'source_documents')
     embeddings_model_name = os.environ.get('EMBEDDINGS_MODEL_NAME')
-
+    os.makedirs(source_directory, exist_ok=True)
     # Load documents and split in chunks
     print(f"Loading documents from {source_directory}")
     chunk_size = 500
