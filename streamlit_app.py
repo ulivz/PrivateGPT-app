@@ -4,8 +4,7 @@ import streamlit as st
 import requests
 from typing import List
 
-# API_BASE_URL = "https://eowfl5fkfhiiiqs.m.pipedream.net"  # Update with the appropriate URL
-API_BASE_URL = "http://localhost:8000"
+API_BASE_URL = "http://localhost:8000"  # Update with the appropriate URL
 
 load_dotenv()
 
