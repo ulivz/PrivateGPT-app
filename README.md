@@ -2,6 +2,12 @@
 
 This repository contains a FastAPI backend and Streamlit app for PrivateGPT, an application built by [imartinez](https://github.com/imartinez). The PrivateGPT App provides an interface to privateGPT, with options to embed and retrieve documents using a language model and an embeddings-based retrieval system. All data remains local. 
 
+Easiest way to deploy:
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/-jNgRG?referralCode=63H2w2)
+
+Make sure to use the __developer plan__ to make sure you have enough memory for the app to run.
+
 ## Requirements
 
 - Python 3.11 or later
@@ -31,7 +37,7 @@ This repository contains a FastAPI backend and Streamlit app for PrivateGPT, an 
 
 To run the FastAPI backend, execute the following command:
 ```
-gunicorn app:app -k uvicorn.workers.UvicornWorker --reload --timeout 500
+gunicorn app:app -k uvicorn.workers.UvicornWorker --timeout 500
 ```
 This command starts the backend server and automatically handles the necessary downloads for the language model and the embedding models. The `--timeout 500` option ensures that sufficient time is allowed for proper model downloading.
 
