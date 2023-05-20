@@ -17,6 +17,7 @@ This repository contains a FastAPI backend and Streamlit app for PrivateGPT, an 
    - `MODEL_PATH`: The path to the language model file.
    - `EMBEDDINGS_MODEL_NAME`: The name of the embeddings model to use.
    - `MODEL_N_CTX`: The number of contexts to consider during model generation.
+   - `API_BASE_URL`: The base API url for the FastAPI app, usually it's deployed to port:8000.
 
 
 3. Install the required dependencies by running the following command:

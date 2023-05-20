@@ -5,7 +5,7 @@ import requests
 from typing import List
 import json
 
-API_BASE_URL = "http://localhost:8000"  # Update with the appropriate URL
+API_BASE_URL = os.environ.get("API_BASE_URL")
 
 load_dotenv()
 
@@ -27,7 +27,7 @@ def main():
     files = st.file_uploader("Upload document", accept_multiple_files=True)
     # collection_name = st.text_input("Collection Name") not working for some reason
     if st.button("Embed"):
-        embed_documents(files, collection_name)
+        embed_documents(files, "collection_name")
     
     # Query section
     st.header("Document Retrieval")
