@@ -11,7 +11,7 @@ Make sure to use the __developer plan__ to make sure you have enough memory for 
 ## Requirements
 
 - Python 3.11 or later
-- Minimum 8GB of memory
+- Minimum 16GB of memory
 
 ## Setup
 
