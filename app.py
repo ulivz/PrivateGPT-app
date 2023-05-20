@@ -74,9 +74,7 @@ async def root():
 
 @app.post("/embed")
 async def embed(files: List[UploadFile], collection_name: Optional[str] = None):
-    if collection_name is None:
-        # Handle the case when the collection_name is not defined
-        collection_name = "default_collection"
+
     saved_files = []
     # Save the files to the specified folder
     for file in files:
@@ -85,6 +83,10 @@ async def embed(files: List[UploadFile], collection_name: Optional[str] = None):
         
         with open(file_path, "wb") as f:
             f.write(await file.read())
+        
+        if collection_name is None:
+            # Handle the case when the collection_name is not defined
+            collection_name = file.filename
     
     os.system(f'python ingest.py --collection {collection_name}')
     

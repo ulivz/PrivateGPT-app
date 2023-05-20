@@ -3,6 +3,7 @@ import os
 import streamlit as st
 import requests
 from typing import List
+import json
 
 API_BASE_URL = "http://localhost:8000"  # Update with the appropriate URL
 
@@ -24,24 +25,24 @@ def main():
     # Document upload section
     st.header("Document Upload")
     files = st.file_uploader("Upload document", accept_multiple_files=True)
-    collection_name = st.text_input("Collection Name")
+    # collection_name = st.text_input("Collection Name") not working for some reason
     if st.button("Embed"):
         embed_documents(files, collection_name)
     
     # Query section
     st.header("Document Retrieval")
     collection_names = get_collection_names()
-    selected_collection = st.selectbox("Select a collection", collection_names)
+    selected_collection = st.selectbox("Select a document", collection_names)
     if selected_collection:
         query = st.text_input("Query")
         if st.button("Retrieve"):
             retrieve_documents(query, selected_collection)
 
-def embed_documents(files:List, collection_name):
+def embed_documents(files:List[st.runtime.uploaded_file_manager.UploadedFile], collection_name:str):
     endpoint = f"{API_BASE_URL}/embed"
     files_data = [("files", file) for file in files]
     data = {"collection_name": collection_name}
-    
+
     response = requests.post(endpoint, files=files_data, data=data)
     if response.status_code == 200:
         st.success("Documents embedded successfully!")
