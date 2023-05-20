@@ -8,7 +8,6 @@ import os
 from fastapi import FastAPI, UploadFile, File
 from typing import List, Optional
 import urllib.parse
-import shutil
 
 app = FastAPI()
 
@@ -57,6 +56,7 @@ async def model_download():
     os.system(f"wget {url} -O {filename}")
     global model_path 
     model_path = filename
+    os.environ['MODEL_PATH'] = filename
     print("model downloaded")
     
 
@@ -89,7 +89,6 @@ async def embed(files: List[UploadFile], collection_name: Optional[str] = None):
     os.system(f'python ingest.py --collection {collection_name}')
     
     # Delete the contents of the folder
-    # [os.remove(os.path.join(source_directory, item)) if os.path.isfile(os.path.join(source_directory, item)) else shutil.rmtree(os.path.join(source_directory, item)) for item in os.scandir(source_directory)]
     [os.remove(os.path.join(source_directory, file.filename)) or os.path.join(source_directory, file.filename) for file in files]
     
     return {"message": "Files embedded successfully", "saved_files": saved_files}
