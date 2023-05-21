@@ -4,9 +4,15 @@ This repository contains a FastAPI backend and Streamlit app for PrivateGPT, an 
 
 Easiest way to deploy:
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/-jNgRG?referralCode=63H2w2)
+Deploy Full App on Railway
 
-Make sure to use the __developer plan__ to make sure you have enough memory for the app to run.
+[![Deploy Full App on Railway](https://railway.app/button.svg)](https://railway.app/template/UGRfDo?referralCode=63H2w2)
+
+Deploy Backend on Railway
+
+[![Deploy Backend on Railway](https://railway.app/button.svg)](https://railway.app/template/kbkd4w?referralCode=63H2w2)
+
+__Developer plan__ will be needed to make sure there is enough memory for the app to run.
 
 ## Requirements
 
@@ -37,7 +43,7 @@ Make sure to use the __developer plan__ to make sure you have enough memory for 
 
 To run the FastAPI backend, execute the following command:
 ```
-gunicorn app:app -k uvicorn.workers.UvicornWorker --timeout 500
+gunicorn app:app -k uvicorn.workers.UvicornWorker --timeout 1500
 ```
 This command starts the backend server and automatically handles the necessary downloads for the language model and the embedding models. The `--timeout 500` option ensures that sufficient time is allowed for proper model downloading.
 
